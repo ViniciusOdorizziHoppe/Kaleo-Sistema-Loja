@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Venda - Kaleo</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header>
+  Área de Vendas 🛒
+</header>
+
+<div class="container">
+
+  <div class="card">
+    <h2>Nova Venda</h2>
+
+    <select id="produtoSelect"></select>
+
+    <input type="number" id="quantidade" placeholder="Quantidade" value="1">
+
+    <button onclick="adicionarItem()">Adicionar</button>
+  </div>
+
+  <div class="card">
+    <h2>Carrinho</h2>
+    <ul id="carrinho"></ul>
+    <h3>Total: R$ <span id="total">0</span></h3>
+    <button onclick="finalizarVenda()">Finalizar Venda</button>
+  </div>
+
+</div>
+
+<script>
+let carrinho = [];
+let produtos = [];
+
+async function carregarProdutos() {
+  const res = await fetch("/produtos");
+  produtos = await res.json();
+
+  const select = document.getElementById("produtoSelect");
+  select.innerHTML = "";
+
+  produtos.forEach(p => {
+    const option = document.createElement("option");
+    option.value = p.id;
+    option.text = p.nome + " - R$ " + p.preco;
+    select.appendChild(option);
+  });
+}
+
+function adicionarItem() {
+  const produtoId = document.getElementById("produtoSelect").value;
+  const quantidade = Number(document.getElementById("quantidade").value);
+
+  const produto = produtos.find(p => p.id == produtoId);
+
+  carrinho.push({
+    ...produto,
+    quantidade
+  });
+
+  atualizarCarrinho();
+}
+
+function atualizarCarrinho() {
+  const lista = document.getElementById("carrinho");
+  lista.innerHTML = "";
+
+  let total = 0;
+
+  carrinho.forEach(item => {
+    const li = document.createElement("li");
+    const subtotal = item.preco * item.quantidade;
+    total += subtotal;
+
+    li.innerHTML = `
+      <span>${item.nome} x${item.quantidade}</span>
+      <strong>R$ ${subtotal}</strong>
+    `;
+
+    lista.appendChild(li);
+  });
+
+  document.getElementById("total").innerText = total.toFixed(2);
+}
+
+async function finalizarVenda() {
+  if (carrinho.length === 0) {
+    alert("Carrinho vazio");
+    return;
+  }
+
+  await fetch("/vendas", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ itens: carrinho })
+  });
+
+  alert("Venda registrada com sucesso!");
+
+  carrinho = [];
+  atualizarCarrinho();
+}
+
+window.onload = carregarProdutos;
+</script>
+
+</body>
+</html>

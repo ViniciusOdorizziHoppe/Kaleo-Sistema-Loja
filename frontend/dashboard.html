@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<script>
+const usuario = JSON.parse(localStorage.getItem("usuario"));
+
+if (!usuario) {
+  window.location.href = "login.html";
+}
+</script>
+
+<header>Dashboard Kaleo</header>
+
+<div class="container">
+
+  <div class="grid">
+    <div class="card">
+      <h3>Total Hoje</h3>
+      <p id="totalHoje"></p>
+    </div>
+
+    <div class="card">
+      <h3>Lucro Hoje</h3>
+      <p id="lucroHoje"></p>
+    </div>
+
+    <div class="card">
+      <h3>Crescimento Mensal</h3>
+      <p id="crescimento"></p>
+    </div>
+  </div>
+
+  <div class="card">
+    <canvas id="graficoMensal"></canvas>
+  </div>
+
+</div>
+
+<script src="js/dashboard.js"></script>
+</body>
+</html>

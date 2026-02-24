@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login - Kaleo</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="login-container">
+  <div class="login-card">
+    <h2>Kaleo Sistema 🚀</h2>
+    <p>Área Restrita</p>
+
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="senha" placeholder="Senha">
+
+    <button onclick="login()">Entrar</button>
+
+    <p id="erro" class="erro"></p>
+  </div>
+</div>
+
+<script src="js/api.js"></script>
+<script>
+const usuario = JSON.parse(localStorage.getItem("usuario"));
+
+if (usuario) {
+  redirecionar(usuario);
+}
+
+function redirecionar(user) {
+  if (user.tipo === "admin") {
+    window.location.href = "dashboard.html";
+  } else {
+    window.location.href = "venda.html";
+  }
+}
+
+async function login() {
+  const email = document.getElementById("email").value;
+  const senha = document.getElementById("senha").value;
+  const erro = document.getElementById("erro");
+
+  erro.innerText = "";
+
+  if (!email || !senha) {
+    erro.innerText = "Preencha todos os campos.";
+    return;
+  }
+
+  try {
+    const response = await api.post("/auth/login", { email, senha });
+
+    localStorage.setItem("usuario", JSON.stringify(response));
+
+    redirecionar(response);
+
+  } catch (err) {
+    erro.innerText = "Email ou senha inválidos.";
+  }
+}
+</script>
+
+</body>
+</html>
